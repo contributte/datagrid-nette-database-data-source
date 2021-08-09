@@ -41,20 +41,15 @@
     "greenlion/php-sql-parser": "^4.2"
   },
   "require-dev": {
-    "nette/tester": "^2.2",
-    "tracy/tracy": "^2.6",
-    "mockery/mockery": "^1.2",
-    "phpstan/phpstan": "^0.11",
-    "phpstan/phpstan-strict-rules": "^0.11",
-    "ninjify/coding-standard": "^0.9"
+    "nette/tester": "^2.4.0",
+    "tracy/tracy": "^2.8.0",
+    "mockery/mockery": "^1.2.0",
+    "phpstan/phpstan": "^0.12",
+    "phpstan/phpstan-strict-rules": "^0.12",
+    "ninjify/coding-standard": "^0.12"
   },
   "prefer-stable": true,
   "minimum-stability": "dev",
-  "scripts": {
-    "phpstan": "vendor/phpstan/phpstan/bin/phpstan analyse -c vendor/phpstan/phpstan-strict-rules/rules.neon src --level 7",
-    "phpcs": "vendor/bin/phpcs --standard=vendor/ninjify/coding-standard/ruleset-gamee.xml --extensions=php,phpt --tab-width=4 --ignore=temp -sp src tests",
-    "phpcsfix": "vendor/bin/phpcbf --standard=vendor/ninjify/coding-standard/ruleset-gamee.xml --extensions=php,phpt --tab-width=4 --ignore=temp -sp src tests"
-  },
   "extra": {
     "branch-alias": {
       "dev-master": "3.0.x-dev"

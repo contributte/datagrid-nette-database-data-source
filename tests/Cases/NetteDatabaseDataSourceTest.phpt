@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ublaboo\DataGrid\Tests\Cases;
+namespace Tests\Cases;
 
 use Nette\Caching\Storages\DevNullStorage;
 use Nette\Database\Connection;
@@ -198,7 +198,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 			$filter3,
 			$filter4,
 			$filter5,
-			$filter6
+			$filter6,
 		]);
 
 		$q = $s->getQuery();

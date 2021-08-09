@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * @copyright   Copyright (c) 2016 ublaboo <ublaboo@paveljanda.com>
- * @author      Pavel Janda <me@paveljanda.com>
- * @package     Ublaboo
- */
-
 namespace Ublaboo\NetteDatabaseDataSource;
 
 use Nette\Database\Context;
@@ -32,13 +26,13 @@ class NetteDatabaseDataSource implements IDataSource
 	protected $connection;
 
 	/**
-	 * @var array
+	 * @var mixed[]
 	 */
 	protected $data = [];
 
 	/**
 	 * Query parameters
-	 * @var array
+	 * @var mixed[]
 	 */
 	protected $queryParameters;
 
@@ -58,7 +52,9 @@ class NetteDatabaseDataSource implements IDataSource
 	 */
 	protected $queryHelper;
 
-
+	/**
+	 * @param mixed[] $params
+	 */
 	public function __construct(Context $connection, string $sql, array $params = [])
 	{
 		$this->connection = $connection;
@@ -69,9 +65,10 @@ class NetteDatabaseDataSource implements IDataSource
 		$this->queryHelper = new QueryHelper($this->sql);
 	}
 
-
 	/**
 	 * Get current sql + query parameters
+	 *
+	 * @return mixed[]
 	 */
 	public function getQuery(): array
 	{
@@ -79,71 +76,6 @@ class NetteDatabaseDataSource implements IDataSource
 
 		return [$sql, $this->queryParameters];
 	}
-
-
-	/**
-	 * @param string $sql
-	 */
-	protected function addParams(string $sql): array
-	{
-		$params = $this->queryParameters;
-
-		array_unshift($params, $sql);
-
-		return $params;
-	}
-
-
-	/**
-	 * Call Context::query() with current sql + params
-	 */
-	protected function query(string $sql): ResultSet
-	{
-		$sql = preg_replace('/_\?\w{13}\?_/', '?', $sql);
-
-		if ($sql === null) {
-			throw new \UnexpectedValueException;
-		}
-
-		return $this->connection->query(...$this->addParams($sql));
-	}
-
-
-	/**
-	 * @param mixed $value
-	 */
-	protected function applyWhere(string $column, $value, string $operator = '='): void
-	{
-		$id = '_?' . uniqid() . '?_';
-
-		$this->sql = $this->queryHelper->where($column, $id, $operator);
-
-		/**
-		 * Find occurances of placeholders ('?') before inserted placeholder
-		 */
-		[$before, ] = explode($id, $this->sql);
-
-		if ($before === null) {
-			throw new \UnexpectedValueException;
-		}
-
-		$occurances = substr_count($before, '?');
-
-		/**
-		 * Add $value to query parameters at proper place
-		 */
-		if ($occurances === 0) {
-			array_unshift($this->queryParameters, $value);
-		} else {
-			array_splice($this->queryParameters, $occurances, 0, $value);
-		}
-	}
-
-
-	/********************************************************************************
-	 *                          IDataSource implementation                          *
-	 ********************************************************************************/
-
 
 	/**
 	 * {@inheritDoc}
@@ -155,7 +87,7 @@ class NetteDatabaseDataSource implements IDataSource
 				if ($filter->getConditionCallback() !== null) {
 					$this->sql = call_user_func_array(
 						$filter->getConditionCallback(),
-						[$this->sql, $filter->getValue(), & $this->queryParameters]
+						[$this->sql, $filter->getValue(), &$this->queryParameters]
 					);
 					$this->queryHelper->resetQuery($this->sql);
 				} else {
@@ -177,31 +109,30 @@ class NetteDatabaseDataSource implements IDataSource
 		}
 	}
 
-
 	public function getCount(): int
 	{
 		$sql = $this->queryHelper->getCountSelect();
 		$query = $this->query($sql)->fetch();
-		
+
 		return $query === null
-		
+
 			? 0
-		
+
 			: $query['count'];
 	}
 
 
 	/**
-	 * {@inheritDoc}
+	 * @return mixed[]
 	 */
 	public function getData(): array
 	{
-		return $this->data ?: $this->query($this->sql)->fetchAll();
+		return $this->data ?? $this->query($this->sql)->fetchAll();
 	}
 
 
 	/**
-	 * {@inheritDoc}
+	 * @param mixed[] $condition
 	 */
 	public function filterOne(array $condition): IDataSource
 	{
@@ -212,7 +143,6 @@ class NetteDatabaseDataSource implements IDataSource
 		return $this;
 	}
 
-
 	public function limit(int $offset, int $limit): IDataSource
 	{
 		$sql = $this->queryHelper->limit($limit, $offset);
@@ -221,7 +151,6 @@ class NetteDatabaseDataSource implements IDataSource
 
 		return $this;
 	}
-
 
 	public function sort(Sorting $sorting): IDataSource
 	{
@@ -246,6 +175,67 @@ class NetteDatabaseDataSource implements IDataSource
 		return $this;
 	}
 
+	/**
+	 * @return mixed[]
+	 */
+	protected function addParams(string $sql): array
+	{
+		$params = $this->queryParameters;
+
+		array_unshift($params, $sql);
+
+		return $params;
+	}
+
+	/**
+	 * Call Context::query() with current sql + params
+	 *
+	 * @return ResultSet<mixed>
+	 */
+	protected function query(string $sql): ResultSet
+	{
+		$sql = preg_replace('/_\?\w{13}\?_/', '?', $sql);
+
+		if ($sql === null) {
+			throw new \UnexpectedValueException;
+		}
+
+		return $this->connection->query(...$this->addParams($sql));
+	}
+
+	/**
+	 * @param mixed $value
+	 */
+	protected function applyWhere(string $column, $value, string $operator = '='): void
+	{
+		$id = '_?' . uniqid() . '?_';
+
+		$this->sql = $this->queryHelper->where($column, $id, $operator);
+
+		/**
+		 * Find occurances of placeholders ('?') before inserted placeholder
+		 */
+		[$before,] = explode($id, $this->sql);
+
+		if ($before === null) {
+			throw new \UnexpectedValueException;
+		}
+
+		$occurances = substr_count($before, '?');
+
+		/**
+		 * Add $value to query parameters at proper place
+		 */
+		if ($occurances === 0) {
+			array_unshift($this->queryParameters, $value);
+		} else {
+			array_splice($this->queryParameters, $occurances, 0, $value);
+		}
+	}
+	/********************************************************************************
+	 *                          IDataSource implementation *
+	 ********************************************************************************/
+
 
 	protected function applyFilterDate(FilterDate $filter): void
 	{
@@ -263,13 +253,12 @@ class NetteDatabaseDataSource implements IDataSource
 		$this->applyWhere("DATE({$filter->getColumn()})", $date->format('Y-m-d'));
 	}
 
-
 	protected function applyFilterDateRange(FilterDateRange $filter): void
 	{
 		$conditions = $filter->getCondition();
 
 		$valueFrom = $conditions[$filter->getColumn()]['from'];
-		$valueTo   = $conditions[$filter->getColumn()]['to'];
+		$valueTo = $conditions[$filter->getColumn()]['to'];
 
 		if ($valueFrom) {
 			$dateFrom = DateTimeHelper::tryConvertToDateTime($valueFrom, [$filter->getPhpFormat()]);
@@ -288,13 +277,12 @@ class NetteDatabaseDataSource implements IDataSource
 		}
 	}
 
-
 	protected function applyFilterRange(FilterRange $filter): void
 	{
 		$conditions = $filter->getCondition();
 
 		$valueFrom = $conditions[$filter->getColumn()]['from'];
-		$valueTo   = $conditions[$filter->getColumn()]['to'];
+		$valueTo = $conditions[$filter->getColumn()]['to'];
 
 		if ($valueFrom !== null && $valueFrom !== '') {
 			$this->applyWhere($filter->getColumn(), $valueFrom, '>=');
@@ -304,7 +292,6 @@ class NetteDatabaseDataSource implements IDataSource
 			$this->applyWhere($filter->getColumn(), $valueTo, '<=');
 		}
 	}
-
 
 	protected function applyFilterText(FilterText $filter): void
 	{
@@ -327,8 +314,8 @@ class NetteDatabaseDataSource implements IDataSource
 				$like .= "$column $operator ? OR ";
 				$args[] = $isSeachExact
 					? $value
-					:"%$value%";
-			}else{
+					: "%$value%";
+			} else {
 				$words = explode(' ', $value);
 
 				foreach ($words as $word) {
@@ -339,7 +326,7 @@ class NetteDatabaseDataSource implements IDataSource
 				}
 			}
 
-			$like = substr($like, 0, strlen($like) - 4).')';
+			$like = substr($like, 0, strlen($like) - 4) . ')';
 
 			$or[] = $like;
 			$big_or .= "$like OR ";
@@ -347,7 +334,7 @@ class NetteDatabaseDataSource implements IDataSource
 		}
 
 		if (sizeof($or) > 1) {
-			$or = substr($big_or, 0, strlen($big_or) - 4).')';
+			$or = substr($big_or, 0, strlen($big_or) - 4) . ')';
 
 			$args = $big_or_args;
 		} else {
@@ -365,14 +352,12 @@ class NetteDatabaseDataSource implements IDataSource
 		}
 	}
 
-
 	protected function applyFilterSelect(FilterSelect $filter): void
 	{
 		foreach ($filter->getCondition() as $column => $value) {
 			$this->applyWhere($column, $value);
 		}
 	}
-
 
 	protected function applyFilterMultiSelect(FilterMultiSelect $filter): void
 	{
@@ -388,14 +373,14 @@ class NetteDatabaseDataSource implements IDataSource
 				$args[] = $value;
 			}
 
-			$queryPart = substr($queryPart, 0, strlen($queryPart) - 4).')';
+			$queryPart = substr($queryPart, 0, strlen($queryPart) - 4) . ')';
 			$or[] = $queryPart;
 			$big_or .= "$queryPart OR ";
 			$big_or_args = array_merge($big_or_args, $args);
 		}
 
 		if (sizeof($or) > 1) {
-			$or = substr($big_or, 0, strlen($big_or) - 4).')';
+			$or = substr($big_or, 0, strlen($big_or) - 4) . ')';
 			$args = $big_or_args;
 		} else {
 			$or = reset($or);

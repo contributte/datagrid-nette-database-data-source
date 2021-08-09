@@ -16,15 +16,14 @@ class QueryHelper
 	protected $sqlParser;
 
 	/**
-	 * @var PHPSQLCreator
-	 */
-	private $sqlCreator;
-
-	/**
-	 * @var array
+	 * @var mixed[]
 	 */
 	protected $query;
 
+	/**
+	 * @var PHPSQLCreator
+	 */
+	private $sqlCreator;
 
 	public function __construct(string $sql)
 	{
@@ -34,15 +33,16 @@ class QueryHelper
 		$this->query = $this->prepare($this->sqlParser->parse($sql));
 	}
 
-
 	public function resetQuery(string $sql): void
 	{
 		$this->query = $this->prepare($this->sqlParser->parse($sql));
 	}
 
-
 	/**
 	 * In case query contains a more complicated query, place it within brackets: (<complicated_expr>)
+	 *
+	 * @param mixed[] $query
+	 * @return mixed[]
 	 */
 	public function prepare(array $query): array
 	{
@@ -65,7 +65,6 @@ class QueryHelper
 		return $query;
 	}
 
-
 	public function getCountSelect(): string
 	{
 		$query = $this->query;
@@ -73,8 +72,8 @@ class QueryHelper
 		$query['SELECT'] = [[
 			'expr_type' => 'aggregate_function',
 			'alias' => [
-				'as'        => true,
-				'name'      => 'count',
+				'as' => true,
+				'name' => 'count',
 				'base_expr' => 'AS count',
 				'no_quotes' => [
 					'delim' => false,
@@ -82,27 +81,25 @@ class QueryHelper
 				],
 			],
 			'base_expr' => 'COUNT',
-			'sub_tree'  => [[
+			'sub_tree' => [[
 				'expr_type' => 'colref',
 				'base_expr' => '*',
-				'sub_tree'  => false,
+				'sub_tree' => false,
 			]],
 		]];
 
 		return $this->sqlCreator->create($query);
 	}
 
-
 	public function limit(int $limit, int $offset): string
 	{
 		$this->query['LIMIT'] = [
-			'offset'   => $offset,
+			'offset' => $offset,
 			'rowcount' => $limit,
 		];
 
 		return $this->sqlCreator->create($this->query);
 	}
-
 
 	public function orderBy(string $column, string $order): string
 	{
@@ -113,17 +110,14 @@ class QueryHelper
 				'delim' => false,
 				'parts' => [$column],
 			],
-			'subtree'   => false,
+			'subtree' => false,
 			'direction' => $order,
 		]];
 
 		return $this->sqlCreator->create($this->query);
 	}
 
-
-	/**
-	 * @param  mixed  $value
-	 */
+	/** @param mixed $value */
 	public function where(string $column, $value, string $operator): string
 	{
 		if (!isset($this->query['WHERE'])) {
@@ -132,7 +126,7 @@ class QueryHelper
 			$this->query['WHERE'][] = [
 				'expr_type' => 'operator',
 				'base_expr' => 'AND',
-				'sub_tree'  => false,
+				'sub_tree' => false,
 			];
 		}
 
@@ -152,7 +146,7 @@ class QueryHelper
 					'delim' => '.',
 					'parts' => [$alias, $column],
 				],
-				'sub_tree'  => false,
+				'sub_tree' => false,
 			];
 		} else {
 			/**
@@ -165,7 +159,7 @@ class QueryHelper
 					'delim' => false,
 					'parts' => [$column],
 				],
-				'sub_tree'  => false,
+				'sub_tree' => false,
 			];
 		}
 
@@ -175,22 +169,21 @@ class QueryHelper
 		$this->query['WHERE'][] = [
 			'expr_type' => 'operator',
 			'base_expr' => $operator,
-			'sub_tree'  => false,
+			'sub_tree' => false,
 		];
 
 		/**
 		 * ?
-		 * 	($value == '_?_')
+		 *    ($value == '_?_')
 		 */
 		$this->query['WHERE'][] = [
 			'expr_type' => 'const',
 			'base_expr' => $value,
-			'sub_tree'  => false,
+			'sub_tree' => false,
 		];
 
 		return $this->sqlCreator->create($this->query);
 	}
-
 
 	public function whereSql(string $sql): string
 	{
@@ -200,7 +193,7 @@ class QueryHelper
 			$this->query['WHERE'][] = [
 				'expr_type' => 'operator',
 				'base_expr' => 'AND',
-				'sub_tree'  => false,
+				'sub_tree' => false,
 			];
 		}
 
@@ -211,5 +204,4 @@ class QueryHelper
 
 		return $this->sqlCreator->create($this->query);
 	}
-
 }

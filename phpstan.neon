@@ -1,0 +1,6 @@
+includes:
+	- ./vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+	ignoreErrors:
+		- "#^Strict comparison using === between string and null will always evaluate to false.$#"
