@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ '7.2', '7.3', '7.4' ]
+        php: [ "7.2", "7.3", "7.4", "8.0" ]
 
       fail-fast: false
 
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.0
           extensions: json, mbstring, xml, tokenizer, xdebug
           coverage: none
 
