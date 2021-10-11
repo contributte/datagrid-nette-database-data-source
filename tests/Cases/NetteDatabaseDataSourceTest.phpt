@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Cases;
 
+use Mockery;
 use Nette\Caching\Storages\DevNullStorage;
 use Nette\Database\Connection;
 use Nette\Database\Context;
+use Nette\Database\ResultSet;
 use Nette\Database\Structure;
+use ReflectionClass;
 use Tester\Assert;
 use Tester\TestCase;
 use Ublaboo;
@@ -157,6 +160,38 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		Assert::same('SELECT * FROM user WHERE ((name = ?) OR (id = ?))', $q[0]);
 		Assert::same(['text with space', 'text with space'], $q[1]);
+	}
+
+	public function testGetDataFromDatabase(): void
+	{
+		$data = ['foo', 'bar'];
+
+		$resultSet = Mockery::mock(ResultSet::class);
+		$resultSet->shouldReceive('fetchAll')
+			->once()
+			->andReturn($data);
+
+		$connection = Mockery::mock(Context::class);
+		$connection->shouldReceive('query')
+			->once()
+			->andReturn($resultSet);
+
+		$s = new NetteDatabaseDataSource($connection, 'SELECT * FROM user');
+
+		Assert::same($data, $s->getData());
+	}
+
+	public function testGetDataAlreadyStored(): void
+	{
+		$data = ['foo', 'bar'];
+
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$rc = new ReflectionClass(get_class($s));
+		$rp = $rc->getProperty('data');
+		$rp->setAccessible(true);
+		$rp->setValue($s, $data);
+
+		Assert::same($data, $s->getData());
 	}
 
 	public function testComplexQuery(): void

@@ -127,7 +127,11 @@ class NetteDatabaseDataSource implements IDataSource
 	 */
 	public function getData(): array
 	{
-		return $this->data ?? $this->query($this->sql)->fetchAll();
+		if ($this->data === []) {
+			$this->data = $this->query($this->sql)->fetchAll();
+		}
+
+		return $this->data;
 	}
 
 
