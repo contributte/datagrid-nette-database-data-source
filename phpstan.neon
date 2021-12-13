@@ -3,4 +3,5 @@ includes:
 
 parameters:
 	ignoreErrors:
-		- "#^Strict comparison using === between string and null will always evaluate to false.$#"
+		- '#^Strict comparison using === between string and null will always evaluate to false.$#'
+		- '#^Parameter \#1 \$sql of method Nette\\Database\\Explorer::query\(\) expects literal-string, mixed given.$#'
