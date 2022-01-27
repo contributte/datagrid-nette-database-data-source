@@ -12,7 +12,7 @@ csf:
 	vendor/bin/phpcbf --standard=ruleset.xml --extensions=php,phpt --tab-width=4 --ignore=temp -sp src tests
 
 phpstan:
-	vendor/bin/phpstan analyse -l 8 -c phpstan.neon --memory-limit=512M src
+	vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M
 
 tests:
 	vendor/bin/tester -s -p php --colors 1 -C tests

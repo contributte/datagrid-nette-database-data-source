@@ -2,6 +2,9 @@ includes:
 	- ./vendor/phpstan/phpstan-strict-rules/rules.neon
 
 parameters:
+	level: 8
+	paths:
+		- src
 	ignoreErrors:
 		- '#^Strict comparison using === between string and null will always evaluate to false.$#'
 		- '#^Parameter \#1 \$sql of method Nette\\Database\\Explorer::query\(\) expects literal-string, mixed given.$#'
