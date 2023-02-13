@@ -22,7 +22,7 @@ Website ğŸš€ <a href="https://contributte.org">contributte.org</a> | Contact ğŸ‘
 To install latest version of `contributte/datagrid-nette-database-data-source` use [Composer](https://getcomposer.org).
 
 ```bash
-composer require contributte/datagrid-nette-database-data-source
+composer require ublaboo/datagrid-nette-database-data-source
 ```
 
 ## Documentation
