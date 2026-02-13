@@ -40,7 +40,7 @@ jobs:
           key: "${{ env.cache-version }}"
 
       - name: "Cache PHP extensions"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.extcache.outputs.dir }}"
           key: "${{ steps.extcache.outputs.key }}"
@@ -61,7 +61,7 @@ jobs:
         run: 'echo "::set-output name=dir::$(composer config cache-files-dir)"'
 
       - name: "Cache PHP dependencies"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.composercache.outputs.dir }}"
           key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}"
@@ -99,7 +99,7 @@ jobs:
           key: "${{ env.cache-version }}"
 
       - name: "Cache PHP extensions"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.extcache.outputs.dir }}"
           key: "${{ steps.extcache.outputs.key }}"
@@ -120,7 +120,7 @@ jobs:
         run: 'echo "::set-output name=dir::$(composer config cache-files-dir)"'
 
       - name: "Cache PHP dependencies"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.composercache.outputs.dir }}"
           key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}"
@@ -147,19 +147,14 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["7.4"]
+        php-version: ["7.4", "8.0"]
         operating-system: ["ubuntu-latest"]
         composer-args: [ "" ]
         include:
           - php-version: "7.4"
             operating-system: "ubuntu-latest"
             composer-args: "--prefer-lowest"
-          - php-version: "8.0"
-            operating-system: "ubuntu-latest"
-            composer-args: "--ignore-platform-reqs"
       fail-fast: false
-
-    continue-on-error: "${{ matrix.php-version == '8.0' }}"
 
     steps:
       - name: "Checkout"
@@ -174,7 +169,7 @@ jobs:
           key: "${{ env.cache-version }}"
 
       - name: "Cache PHP extensions"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.extcache.outputs.dir }}"
           key: "${{ steps.extcache.outputs.key }}"
@@ -195,7 +190,7 @@ jobs:
         run: 'echo "::set-output name=dir::$(composer config cache-files-dir)"'
 
       - name: "Cache PHP dependencies"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.composercache.outputs.dir }}"
           key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}"
@@ -244,7 +239,7 @@ jobs:
           key: "${{ env.cache-version }}"
 
       - name: "Cache PHP extensions"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.extcache.outputs.dir }}"
           key: "${{ steps.extcache.outputs.key }}"
@@ -265,7 +260,7 @@ jobs:
         run: 'echo "::set-output name=dir::$(composer config cache-files-dir)"'
 
       - name: "Cache PHP dependencies"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: "${{ steps.composercache.outputs.dir }}"
           key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}"
