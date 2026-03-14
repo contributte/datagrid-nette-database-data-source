@@ -1,7 +1,8 @@
 ![](https://heatbadger.now.sh/github/readme/contributte/datagrid-nette-database-data-source/)
 
 <p align=center>
-  <a href="https://travis-ci.org/contributte/datagrid-nette-database-data-source"><img src="https://img.shields.io/travis/contributte/datagrid-nette-database-data-source.svg?style=flat-square"></a>
+  <a href="https://github.com/contributte/datagrid-nette-database-data-source/actions"><img src="https://badgen.net/github/checks/contributte/datagrid-nette-database-data-source/master"></a>
+  <a href="https://codecov.io/gh/contributte/datagrid-nette-database-data-source"><img src="https://badgen.net/codecov/c/github/contributte/datagrid-nette-database-data-source"></a>
   <a href="https://packagist.org/packages/ublaboo/datagrid-nette-database-data-source"><img src="https://badgen.net/packagist/dm/ublaboo/datagrid-nette-database-data-source"></a>
   <a href="https://packagist.org/packages/ublaboo/datagrid-nette-database-data-source"><img src="https://badgen.net/packagist/v/ublaboo/datagrid-nette-database-data-source"></a>
 </p>
